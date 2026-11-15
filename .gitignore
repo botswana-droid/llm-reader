@@ -1,0 +1,5 @@
+.DS_Store
+.test/
+# Obsolete macOS launchers (the app is hosted on GitHub Pages now)
+LLM Reader.app/
+Stop LLM Reader.app/

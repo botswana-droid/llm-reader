@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LLM Reader</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Welcome / library screen -->
+  <div id="welcome" class="welcome">
+    <div class="welcome-card">
+      <button id="welcome-close" class="close-btn" title="Back to reading" hidden>×</button>
+      <h1>LLM Reader</h1>
+      <p class="tagline">Read books and PDFs deeper, in three passes.</p>
+
+      <ol class="phases">
+        <li>
+          <strong>Pass 1 — Read it yourself.</strong>
+          The old-fashioned way. No AI. Just you and the chapter, marking what surprises or confuses you.
+        </li>
+        <li>
+          <strong>Pass 2 — Highlight what matters.</strong>
+          Select any passage to save it as a highlight. Highlights stay in the book and stack up in the Highlights tab.
+        </li>
+        <li>
+          <strong>Pass 3 — Send it to Claude or ChatGPT.</strong>
+          Copy any chapter, your highlights, or the whole book to the clipboard with a ready-to-go prompt. Paste into the Claude.ai or ChatGPT app.
+        </li>
+      </ol>
+
+      <div id="recent-section" hidden>
+        <h3>Your library</h3>
+        <ul id="recent-books"></ul>
+      </div>
+
+      <div class="welcome-actions">
+        <button id="welcome-pick" class="primary">Open an EPUB or PDF</button>
+      </div>
+
+      <p class="hint">
+        Books and highlights stay on this device (IndexedDB). Nothing is uploaded anywhere — copy/paste is the handoff.
+      </p>
+    </div>
+  </div>
+
+  <!-- App shell (shown when a book is open) -->
+  <div id="app" class="app" hidden>
+    <aside class="toc-panel">
+      <header class="panel-header">
+        <div class="header-actions">
+          <button id="open-btn" title="Library / open another book">📚</button>
+        </div>
+        <h2 id="book-title">—</h2>
+        <p id="book-author" class="subtle"></p>
+      </header>
+      <ul id="toc-list"></ul>
+    </aside>
+
+    <main class="reader-panel">
+      <article id="reader-content"></article>
+    </main>
+
+    <aside class="side-panel">
+      <nav class="tabs">
+        <button data-tab="send" class="tab active">Send</button>
+        <button data-tab="highlights" class="tab">Highlights <span id="hl-badge" class="hl-badge"></span></button>
+      </nav>
+
+      <!-- ── Send tab ──────────────────────────────────── -->
+      <section class="tab-content send-panel" data-panel="send">
+        <div class="send-section">
+          <div class="send-label">Source</div>
+          <div class="segmented" id="send-source-group">
+            <label><input type="radio" name="send-source" value="chapter" checked> Chapter</label>
+            <label><input type="radio" name="send-source" value="book"> Whole book</label>
+            <label><input type="radio" name="send-source" value="selection" disabled> Selection</label>
+            <label><input type="radio" name="send-source" value="highlights"> Highlights</label>
+          </div>
+          <div id="hl-scope-wrap" class="hl-scope-wrap" hidden>
+            <div class="segmented segmented-thin">
+              <label><input type="radio" name="hl-scope" value="book" checked> All book</label>
+              <label><input type="radio" name="hl-scope" value="chapter"> Current chapter</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="send-section">
+          <div class="send-label">Prompt template</div>
+          <select id="template-select" class="full-width"></select>
+          <div id="custom-wrap" hidden>
+            <textarea id="custom-textarea" rows="3" placeholder="Type your prompt…"></textarea>
+          </div>
+        </div>
+
+        <div class="send-section">
+          <div class="token-line subtle" id="token-line">—</div>
+          <details class="preview-block">
+            <summary>Preview</summary>
+            <pre id="preview-text" class="preview-text"></pre>
+          </details>
+        </div>
+
+        <div class="send-actions">
+          <button id="copy-btn" class="primary">Copy to clipboard</button>
+          <button id="download-btn">Download .md</button>
+        </div>
+      </section>
+
+      <!-- ── Highlights tab ─────────────────────────────── -->
+      <section class="tab-content hl-panel" data-panel="highlights" hidden>
+        <div class="hl-toolbar-static">
+          <button id="hl-select-all-btn" class="ghost">Select all / none</button>
+        </div>
+        <div id="hl-toolbar" class="hl-toolbar" hidden>
+          <span id="hl-toolbar-label" class="subtle">0 selected</span>
+          <button id="hl-copy-selected-btn" class="primary">Copy selected</button>
+          <button id="hl-delete-selected-btn" class="ghost">Delete</button>
+          <button id="hl-clear-sel-btn" class="ghost">Clear</button>
+        </div>
+        <div id="hl-list" class="hl-list"></div>
+      </section>
+    </aside>
+  </div>
+
+  <!-- Floating selection popover -->
+  <div id="highlight-popover" class="highlight-popover" hidden>
+    <button id="popover-copy-btn">Copy with prompt</button>
+    <button id="popover-highlight-btn">Highlight</button>
+  </div>
+
+  <!-- Mark click popover (for <mark> inside the reader) -->
+  <div id="mark-popover" class="highlight-popover" hidden>
+    <button id="mark-copy-btn">Copy</button>
+    <button id="mark-remove-btn">Remove</button>
+  </div>
+
+  <!-- Hidden file input -->
+  <input type="file" id="file-input" accept=".epub,application/epub+zip,.pdf,application/pdf" hidden>
+
+  <!-- Toast / status -->
+  <div id="toast" class="toast" hidden></div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
